@@ -1,4 +1,5 @@
 import React from 'react'
+import { RiDeleteBin3Line } from 'react-icons/ri'
 
 const CartContents = () => {
 
@@ -29,7 +30,7 @@ const CartContents = () => {
         { cartProducts.map((product,index)=>(
             <div
             key={index}
-            className='flex items-start justify-between py-4 border-b'
+            className='flex items-start justify-between py-4 border-b pr-3'
             >
                 <div className='flex items-start'>
                     <img src={product.image} alt={product.name}
@@ -55,6 +56,13 @@ const CartContents = () => {
                         </div>
                       </div>
 
+                </div>
+
+                <div>
+                    <p>${product.price.toLocaleString()}</p>
+                    <button>
+                        <RiDeleteBin3Line className="h-6 w-6 mt-2 text-red-600"/>
+                    </button>
                 </div>
 
             </div>
