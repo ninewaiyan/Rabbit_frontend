@@ -6,7 +6,7 @@ import {
   HiBars3BottomRight,
 } from "react-icons/hi2";
 import Searchbar from "./Searchbar";
-import CardDrawer from "./CardDrawer";
+import CardDrawer from "../Layout/CardDrawer";
 import { IoMdClose } from "react-icons/io";
 
 const NavBar = () => {
