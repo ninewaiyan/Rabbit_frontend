@@ -2,25 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PayPalButton from "./PayPalButton";
 
-const cart = {
-  products: [
-    {
-      name: "Stylish Jacket",
-      size: "M",
-      color: "Black",
-      price: 120,
-      image: "https://picsum.photos/200/300?random=1",
-    },
-    {
-      name: "Casual Sneakers",
-      size: "42",
-      color: "White",
-      price: 75,
-      image: "https://picsum.photos/200/300?random=2",
-    },
-  ],
-  totalPrice: 195,
-};
 const CheckOut = () => {
   const navigate = useNavigate();
   const [checkoutId, setCheckoutId] = useState(null);
@@ -34,15 +15,35 @@ const CheckOut = () => {
     phone: "",
   });
 
-  const handleCreateCheckout = (e) => {
-    e.preventDefault();
-    setCheckoutId(123)
+  const cart = {
+    products: [
+      {
+        name: "Stylish Jacket",
+        size: "M",
+        color: "Black",
+        price: 120,
+        image: "https://picsum.photos/200/300?random=1",
+      },
+      {
+        name: "Casual Sneakers",
+        size: "42",
+        color: "White",
+        price: 75,
+        image: "https://picsum.photos/200/300?random=2",
+      },
+    ],
+    totalPrice: 195,
   };
 
-  const handlePaymentSuccess = (details) =>{
-    console.log("Payment Successful",details);
-    navigate("/order-confirmation"); 
-  }
+  const handleCreateCheckout = (e) => {
+    e.preventDefault();
+    setCheckoutId(123);
+  };
+
+  const handlePaymentSuccess = (details) => {
+    console.log("Payment Successful", details);
+    navigate("/order-confirmation");
+  };
   return (
     <div className=" grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto py-10 px-6 tracking-tighter">
       {/* Left Section */}
@@ -179,10 +180,11 @@ const CheckOut = () => {
               <div>
                 <h3 className="text-lg mb-4">Pay with Paypal</h3>
                 {/* Paypal Component */}
-                <PayPalButton amount={100}
-                onSuccess={handlePaymentSuccess}
-                onError={(err)=>alert("Payment failed.Try again.")}
-                 />
+                <PayPalButton
+                  amount={100}
+                  onSuccess={handlePaymentSuccess}
+                  onError={(err) => alert("Payment failed.Try again.")}
+                />
               </div>
             )}
           </div>
@@ -190,27 +192,33 @@ const CheckOut = () => {
       </div>
 
       {/* Right Section */}
-      <div className="bg-gray-50 p-6 rounded-lg">
+      <div className="bg-gray-100 p-6 rounded-lg">
         <h3 className="text-lg mb-4">Order Summary</h3>
         <div className="border-t py-4 mb-4">
-          {cart.products.map((product,index)=>{
+          {cart.products.map((product, index) => (
+            
+
             <div
-            key={index}
-            className="flex items-start justify-between py-2 border-b"
+              key={index}
+              className="flex items-start justify-between py-2 border-b"
             >
               <div className="flex items-start">
-                <img 
-                src={product.image}
-                 alt={product.name}
-                 className="w-20 h-24 object-cover mr-4"
-                  />
-
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-20 h-24 object-cover mr-4"
+                />
+                <div>
+                  <h3 className="text-mb">{product.name}</h3>
+                  <p className="text-gray-500">Size: {product.size}</p>
+                  <p className="text-gray-500">Color: {product.color}</p>
+                </div>
               </div>
-
+              <p className="text-xl">${product.price?.toLocaleString()}</p>
             </div>
-          })}
+          ))}
         </div>
-        <div></div>
+       
       </div>
     </div>
   );
