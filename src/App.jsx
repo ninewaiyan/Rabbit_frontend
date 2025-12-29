@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import CollectionPage from "./pages/CollectionPage";
 import ProductDetails from "./components/Products/ProductDetails";
 import CheckOut from "./components/Cart/CheckOut";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 
 const App = () => {
   return (
@@ -24,6 +25,9 @@ const App = () => {
           <Route path="collections/:collection" element={<CollectionPage/>} />
           <Route path="product/1" element={<ProductDetails/>}/>
           <Route path="checkout" element={<CheckOut/>}/>
+          <Route path="order-confirmation"
+          element={<OrderConfirmationPage/>}
+          />
 
         </Route>
 
