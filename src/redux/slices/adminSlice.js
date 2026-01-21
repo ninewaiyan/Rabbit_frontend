@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { build } from "vite";
 
 // fetch all users (admin only)
 export const fetchUsers = createAsyncThunk("admin/fetchUsers", async () => {
@@ -84,7 +83,31 @@ const adminSlice = createSlice({
             .addCase(fetchUsers.rejected,(state,action)=>{
                 state.loading = false;
                 state.error = action.error.message;
-            });
+            })
+            .addCase(updateUser.pending, (state,action) => {
+                const updatedUser = action.payload;
+                const userIndex = state.users.findIndex((user) => user._id === updatedUser._id);
+                if(userIndex !== -1){
+                    state.users[userIndex] = updatedUser;
+                }
+            })
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                state.users = state.users.filter((user) => user._id !== action.payload);
+            })
+            .addCase(addUser.pending, (state, action) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addUser.fulfilled , (state, action) => {
+                state.loading = false;
+                state.users.push(action.payload.user); //add a new user to the state
+            })
+            .addCase(addUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload.message;
+            }); 
     },
 
 }) ;
+
+export default adminSlice.reducer;

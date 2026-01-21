@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk, isRejectedWithValue } from "@reduxjs/toolkit";
 import axios from "axios";
-import { build } from "vite";
 
 // Helper function to load cart from localStorage
 const loadCartFromStorage = () => {

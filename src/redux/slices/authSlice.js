@@ -1,7 +1,5 @@
-import js from "@eslint/js"
 import { createSlice, createAsyncThunk, isRejectedWithValue } from "@reduxjs/toolkit";
 import axios from "axios";
-import { generatePath } from "react-router-dom";
 
 // Retrieve user info and token from localStorage if available
 const userFromStorage = localStorage.getItem("userInfo")
