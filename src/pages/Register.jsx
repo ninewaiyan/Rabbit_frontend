@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import register from "../assets/register.webp";
 import { registerUser } from "../redux/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { mergeCart } from "../redux/slices/cartSlice";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -10,12 +11,36 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
 
-  const handleSubmit =(e)=>{
-    e.preventDefault();
-   // console.log("User Registered:",{name,email,password});
-   dispatch(registerUser({name,email,password}));
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, guestId,loading } = useSelector((state) => state.auth);
+  const { cart } = useSelector((state) => state.cart);
+
+  // Get redirect parameter and check if it's is checkout or something
+  const redirect = new URLSearchParams(location.search).get("redirect") || "/";
+  const isCheckoutRedirect = redirect.includes("checkout");
+
+  useEffect(() => {
+    if(user){
+      if(cart?.products.length > 0 && guestId){
+        dispatch(mergeCart({guestId,user})).then(()=>{
+          navigate(isCheckoutRedirect? "/checkout" : "/");
+        });
+    }else{
+      navigate(isCheckoutRedirect? "/checkout" : "/");
+    }
+  }else{
 
   }
+},
+[user,guestId,cart,navigate,isCheckoutRedirect,dispatch]
+);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // console.log("User Registered:",{name,email,password});
+    dispatch(registerUser({ name, email, password }));
+  };
   return (
     <div className="flex">
       <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-12">
@@ -54,7 +79,7 @@ const Register = () => {
           <div className="mb-4">
             <label className="block text-sm font-semibold mb-2">Password</label>
             <input
-              type="text"
+              type="password"a
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-2 border rounded"
@@ -65,11 +90,11 @@ const Register = () => {
             type="submit"
             className="w-full bg-black text-white p-2 rounded-lg font-semibold hover:bg-gray-800"
           >
-            Sign Up
+            {loading?"Loading...":"Sign up"}
           </button>
           <p className="mt-6 text-center text-sm">
             Don't have an account?{" "}
-            <Link to="/login" className="text-blue-500">
+            <Link to={`/login?redirect=${encodeURIComponent(redirect)}`} className="text-blue-500">
               Login
             </Link>
           </p>

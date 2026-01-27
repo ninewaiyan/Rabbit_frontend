@@ -4,6 +4,7 @@ import ProductGrid from "./ProductGrid";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductDetails, fetchSimilarProducts } from "../../redux/slices/productsSlice";
+import { addToCart } from "../../redux/slices/cartSlice";
 
 // const selectedProduct = {
 //   name: "Stylish Jacket",

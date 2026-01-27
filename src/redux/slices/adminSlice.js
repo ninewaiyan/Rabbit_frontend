@@ -9,7 +9,7 @@ export const fetchUsers = createAsyncThunk("admin/fetchUsers", async () => {
             headers: { Authorization: `Bearer ${localStorage.getItem("userToken")}` },
         }
     );
-    response.data;
+   return  response.data;
 });
 
 // Add the create user action
@@ -34,7 +34,7 @@ export const addUser = createAsyncThunk(
     });
 
 // Update user info
-export const updateUser = createAsyncThunk("admin/updateUser",
+export const  updateUser = createAsyncThunk("admin/updateUser",
     async ({ id, name, email, role }) => {
         const response = await axios.put(
             `${import.meta.env.VITE_BACKEND_URL}/api/admin/users/${id}`,
@@ -45,7 +45,7 @@ export const updateUser = createAsyncThunk("admin/updateUser",
                 },
             }
         );
-        response.data;
+       return response.data.user;
     }
 );
 
@@ -84,7 +84,7 @@ const adminSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message;
             })
-            .addCase(updateUser.pending, (state,action) => {
+            .addCase(updateUser.fulfilled, (state,action) => {
                 const updatedUser = action.payload;
                 const userIndex = state.users.findIndex((user) => user._id === updatedUser._id);
                 if(userIndex !== -1){

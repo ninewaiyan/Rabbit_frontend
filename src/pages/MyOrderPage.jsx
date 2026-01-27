@@ -1,50 +1,64 @@
-import React, { useEffect, useState } from "react";
-import { FaShippingFast } from "react-icons/fa";
+import React, { useEffect} from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { fetchUserOrders } from "../redux/slices/orderSlice";
 
 const MyOrderPage = () => {
-  const [orders, setOrders] = useState([]);
+  // const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
-  useEffect(() => {
-    //Simulate fetching orders
-    setTimeout(() => {
-      const mockOrders = [
-        {
-          _id: "12345",
-          createdAt: new Date(),
-          shippingAddress: { city: "New York", country: "USA" },
-          orderItems: [
-            {
-              name: "Product 1",
-              image: "https://picsum.photos/200/300?random=1",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
+  const dispatch = useDispatch();
+  const {orders,loading,error } = useSelector((state)=>state.orders);
+  useEffect(()=>{
+    dispatch(fetchUserOrders());
+  },[dispatch]);
 
-        {
-          _id: "23456",
-          createdAt: new Date(),
-          shippingAddress: { city: "New York", country: "USA" },
-          orderItems: [
-            {
-              name: "Product 2",
-              image: "https://picsum.photos/200/300?random=2",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-      ];
-      setOrders(mockOrders);
-    }, 1000);
-  }, []);
+  // useEffect(() => {
+  //   //Simulate fetching orders
+  //   setTimeout(() => {
+  //     const mockOrders = [
+  //       {
+  //         _id: "12345",
+  //         createdAt: new Date(),
+  //         shippingAddress: { city: "New York", country: "USA" },
+  //         orderItems: [
+  //           {
+  //             name: "Product 1",
+  //             image: "https://picsum.photos/200/300?random=1",
+  //           },
+  //         ],
+  //         totalPrice: 100,
+  //         isPaid: true,
+  //       },
+
+  //       {
+  //         _id: "23456",
+  //         createdAt: new Date(),
+  //         shippingAddress: { city: "New York", country: "USA" },
+  //         orderItems: [
+  //           {
+  //             name: "Product 2",
+  //             image: "https://picsum.photos/200/300?random=2",
+  //           },
+  //         ],
+  //         totalPrice: 100,
+  //         isPaid: true,
+  //       },
+  //     ];
+  //     setOrders(mockOrders);
+  //   }, 1000);
+  // }, []);
 
 const handleRowClick = (orderId)=>{
   navigate(`/order/${orderId}`);
-
 }
+
+console.log(orders);
+
+if(loading) return <p>Loading ...</p>;
+if(error) return <p>Error: {error}</p>;
+
+
+
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
       <h2 className="text-xl sm:text-2xl font-bold mb-6">My Orders</h2>

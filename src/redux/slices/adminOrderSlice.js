@@ -36,6 +36,8 @@ export const updateOrderStatus = createAsyncThunk(
                 },
             }
            );
+
+           return response.data;
         }catch(error){ 
             return rejectWithValue(error.response.data);
          }

@@ -1,9 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PayPalButton from "./PayPalButton";
+import { useDispatch, useSelector } from "react-redux";
+import { createCheckout } from "../../redux/slices/checkoutSlice";
+import axios from "axios";
+import DemoPayPalButton from "./DemoPayPalButton";
+import { toast } from "sonner";
 
 const CheckOut = () => {
+  const USE_DEMO_PAYPAL = import.meta.env.VITE_USE_DEMO_PAYPAL === "true";
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { cart, loading, error } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.auth);
+
   const [checkoutId, setCheckoutId] = useState(null);
   const [shippingAddress, setShippingAddress] = useState({
     firstName: "",
@@ -15,35 +26,100 @@ const CheckOut = () => {
     phone: "",
   });
 
-  const cart = {
-    products: [
-      {
-        name: "Stylish Jacket",
-        size: "M",
-        color: "Black",
-        price: 120,
-        image: "https://picsum.photos/200/300?random=1",
-      },
-      {
-        name: "Casual Sneakers",
-        size: "42",
-        color: "White",
-        price: 75,
-        image: "https://picsum.photos/200/300?random=2",
-      },
-    ],
-    totalPrice: 195,
+  // const cart = {
+  //   products: [
+  //     {
+  //       name: "Stylish Jacket",
+  //       size: "M",
+  //       color: "Black",
+  //       price: 120,
+  //       image: "https://picsum.photos/200/300?random=1",
+  //     },
+  //     {
+  //       name: "Casual Sneakers",
+  //       size: "42",
+  //       color: "White",
+  //       price: 75,
+  //       image: "https://picsum.photos/200/300?random=2",
+  //     },
+  //   ],
+  //   totalPrice: 195,
+  // };
+
+  // Ensure cart is loaded before proceeding
+  useEffect(() => {
+    if (!cart || !cart.products || cart.products.length === 0) {
+      navigate("/");
+    }
+  }, [cart, navigate]);
+
+
+  const handleError = (error) => {
+    console.error("PayPal Error:", error);
+    toast.error("PayPal Service is currently Disable");
   };
 
-  const handleCreateCheckout = (e) => {
+  const handleCreateCheckout = async (e) => {
     e.preventDefault();
-    setCheckoutId(123);
+    if (cart && cart.products.length > 0) {
+      const res = await dispatch(
+        createCheckout({
+          checkoutItems: cart.products,
+          shippingAddress,
+          paymentMethod: "Paypal",
+          totalPrice: cart.totalPrice,
+        }),
+      );
+
+      if (res.payload && res.payload._id) {
+        setCheckoutId(res.payload._id); // Set checkout ID if checkout was successful
+      }
+    }
   };
 
-  const handlePaymentSuccess = (details) => {
-    console.log("Payment Successful", details);
+  const handlePaymentSuccess = async (details) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}/pay`,
+        { paymentStatus: "paid", paymentDetails: details },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+        },
+      );
+
+      await handleFinalizeCheckout(checkoutId); // Finalize checkout if payment is successful
+    } catch (error) {
+      console.error(error);
+    }
+    // console.log("Payment Successful", details);
     navigate("/order-confirmation");
   };
+
+  const handleFinalizeCheckout = async (checkoutId) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}/finalize`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+        },
+      );
+
+      navigate("/order-confirmation");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (loading) return <p>Loading cart ...</p>;
+  if (error) return <p>Error : {error}</p>;
+  if (!cart || !cart.products || cart.products.length === 0) {
+    return <p>Your cart is empty</p>;
+  }
   return (
     <div className=" grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto py-10 px-6 tracking-tighter">
       {/* Left Section */}
@@ -55,7 +131,7 @@ const CheckOut = () => {
             <label className="block text-gray-700 ">Email</label>
             <input
               type="email"
-              value="user@example.com"
+              value={user ? user.email : ""}
               className="w-full p-2 border rounded"
               disabled
             />
@@ -179,12 +255,20 @@ const CheckOut = () => {
             ) : (
               <div>
                 <h3 className="text-lg mb-4">Pay with Paypal</h3>
-                {/* Paypal Component */}
-                <PayPalButton
-                  amount={100}
-                  onSuccess={handlePaymentSuccess}
-                  onError={(err) => alert("Payment failed.Try again.")}
-                />
+
+                {USE_DEMO_PAYPAL ? (
+                  <DemoPayPalButton
+                    amount={cart.totalPrice}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handleError}
+                  />
+                ) : (
+                  <PayPalButton
+                    amount={cart.totalPrice}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handleError}
+                  />
+                )}
               </div>
             )}
           </div>

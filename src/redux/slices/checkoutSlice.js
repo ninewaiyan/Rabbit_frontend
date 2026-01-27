@@ -11,13 +11,13 @@ export const createCheckout = createAsyncThunk(
                 checkoutdata,
                 {
                     headers:{
-                        Authorization:`Bearer ${localStorage.getItem(userToken)}`,
+                        Authorization:`Bearer ${localStorage.getItem("userToken")}`,
                     },
                 }
             );
             return response.data;
         }catch(error){
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error);
         }
     }
 
@@ -42,7 +42,7 @@ const checkoutSlice = createSlice({
         })
         .addCase(createCheckout.rejected,(state,action)=>{
             state.loading = false;
-            state.error = action.payload.message;
+            state.error = action.payload.message || "Failed to create checkout";
         });
     },
 });
