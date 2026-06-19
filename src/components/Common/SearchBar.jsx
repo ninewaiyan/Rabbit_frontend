@@ -6,7 +6,7 @@ import { setFilters,fetchProductsByFilters } from '../../redux/slices/productsSl
 
 
 
-const Searchbar = () => {
+const SearchBar= () => {
     const [searchTerm,setSearchTerm] = useState("");
     const [isOpen , setIsOpen] = useState(false);
     const dispatch = useDispatch();
@@ -71,4 +71,4 @@ const Searchbar = () => {
   )
 }
 
-export default Searchbar
+export default SearchBar

@@ -5,7 +5,7 @@ import {
   HiOutlineShoppingBag,
   HiBars3BottomRight,
 } from "react-icons/hi2";
-import Searchbar from "./Searchbar";
+import SearchBar from "./SearchBar";
 import CardDrawer from "../Layout/CartDrawer";
 import { IoMdClose } from "react-icons/io";
 import { useSelector } from "react-redux";
@@ -97,7 +97,7 @@ const NavBar = () => {
 
           {/** Search */}
           <div className="overflow-hidden">
-            <Searchbar />
+            <SearchBar/>
           </div>
 
           <button className="md:hidden" onClick={toggleNavDrawer}>
